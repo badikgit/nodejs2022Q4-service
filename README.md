@@ -8,7 +8,9 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/badikgit/nodejs2022Q4-service.git
+cd nodejs2022Q4-service
+git switch dev-part1
 ```
 
 ## Installing NPM modules
@@ -20,7 +22,7 @@ npm install
 ## Running application
 
 ```
-npm start
+npm run start
 ```
 
 After starting the app on port (4000 as default) you can open
