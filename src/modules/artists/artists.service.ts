@@ -21,7 +21,9 @@ export class ArtistsService {
   }
 
   findOne(id: string) {
-    const currArtist = MemoryDatabase.artists.find((i) => i.id === id);
+    const currArtist = MemoryDatabase.artists.find(
+      (artist) => artist.id === id,
+    );
     if (!currArtist) {
       throw new NotFoundException('Artist not found');
     }
@@ -31,7 +33,9 @@ export class ArtistsService {
   update(id: string, updateArtistDto: UpdateArtistDto) {
     const currArtist = this.findOne(id);
     if (!currArtist) return;
-    const elemIndex = MemoryDatabase.artists.findIndex((i) => i.id === id);
+    const elemIndex = MemoryDatabase.artists.findIndex(
+      (artist) => artist.id === id,
+    );
 
     MemoryDatabase.artists[elemIndex] = {
       ...MemoryDatabase.artists[elemIndex],
@@ -44,6 +48,8 @@ export class ArtistsService {
   remove(id: string) {
     const currArtist = this.findOne(id);
     if (!currArtist) return;
-    MemoryDatabase.artists = MemoryDatabase.artists.filter((i) => i.id !== id);
+    MemoryDatabase.artists = MemoryDatabase.artists.filter(
+      (artist) => artist.id !== id,
+    );
   }
 }
