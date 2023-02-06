@@ -49,5 +49,8 @@ export class TracksService {
     MemoryDatabase.tracks = MemoryDatabase.tracks.filter(
       (track) => track.id !== id,
     );
+    MemoryDatabase.favorites.tracks = MemoryDatabase.favorites.tracks.filter(
+      (track) => track.id !== id,
+    );
   }
 }

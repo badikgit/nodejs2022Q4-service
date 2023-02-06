@@ -50,5 +50,18 @@ export class AlbumsService {
     MemoryDatabase.albums = MemoryDatabase.albums.filter(
       (album) => album.id !== id,
     );
+    MemoryDatabase.favorites.albums = MemoryDatabase.favorites.albums.filter(
+      (album) => album.id !== id,
+    );
+    MemoryDatabase.tracks.forEach((track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      }
+    });
+    MemoryDatabase.favorites.tracks.forEach((track) => {
+      if (track.albumId === id) {
+        track.albumId = null;
+      }
+    });
   }
 }
