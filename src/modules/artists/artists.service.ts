@@ -51,6 +51,12 @@ export class ArtistsService {
     MemoryDatabase.artists = MemoryDatabase.artists.filter(
       (artist) => artist.id !== id,
     );
+    MemoryDatabase.favorites.artists.forEach((artist) => {
+      if (artist.id === id) {
+        artist.id = null;
+      }
+    });
+
     MemoryDatabase.tracks.forEach((track) => {
       if (track.artistId === id) {
         track.artistId = null;
