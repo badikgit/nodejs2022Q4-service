@@ -1,72 +1,33 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { v4 } from 'uuid';
-import { MemoryDatabase } from 'src/services/db.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DBService } from '../db/db.service';
 
 @Injectable()
 export class UsersService {
-  getAll() {
-    return MemoryDatabase.users.map((user) => {
-      delete user.password;
-      return user;
-    });
+  constructor(private dbService: DBService) {}
+
+  async getAll() {
+    return await this.dbService.getAllUsers();
   }
 
-  getById(id: string, withPassword: boolean) {
-    const currUser = MemoryDatabase.users.find((user) => user.id === id);
-    if (!currUser) {
-      throw new NotFoundException('User not found');
-    }
-    const res = { ...currUser, id };
-    if (!withPassword) {
-      delete res.password;
-    }
-    return res;
+  async getById(id: string, withPassword?: boolean) {
+    return await this.dbService.getUser(id, withPassword);
   }
 
-  create(userDto: CreateUserDto) {
-    const newUser = {
-      id: v4(),
-      login: userDto.login,
-      version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-
-    MemoryDatabase.users.push({ ...newUser, password: userDto.password });
-    return newUser;
+  async create(userDto: CreateUserDto) {
+    return await this.dbService.createUser(userDto);
   }
 
-  remove(id: string) {
-    const currUser = this.getById(id, false);
-    if (!currUser) return;
-    MemoryDatabase.users = MemoryDatabase.users.filter(
-      (user) => user.id !== id,
-    );
+  async remove(id: string) {
+    return await this.dbService.removeUser(id);
   }
 
-  update(updateUserDto: UpdateUserDto, id: string) {
-    const currUser = this.getById(id, true);
-    if (!currUser) return;
-    const elemIndex = MemoryDatabase.users.findIndex((user) => user.id === id);
-
-    MemoryDatabase.users[elemIndex] = {
-      ...MemoryDatabase.users[elemIndex],
-      version: MemoryDatabase.users[elemIndex].version + 1,
-      password: updateUserDto.newPassword,
-      updatedAt: Date.now(),
-    };
-
-    const res = { ...MemoryDatabase.users[elemIndex] };
-    delete res.password;
-    return res;
+  async update(updateUserDto: UpdateUserDto, id: string) {
+    return await this.dbService.updateUser(updateUserDto, id);
   }
 
-  getPass(id: string) {
-    const currUser = this.getById(id, true);
-    return {
-      password: currUser.password,
-    };
+  async getPass(id: string) {
+    return await this.dbService.getUserPass(id);
   }
 }

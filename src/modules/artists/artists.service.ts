@@ -1,81 +1,29 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { MemoryDatabase } from 'src/services/db.service';
-import { v4 as uuid } from 'uuid';
+import { DBService } from '../db/db.service';
 
 @Injectable()
 export class ArtistsService {
-  create(createArtistDto: CreateArtistDto) {
-    const newArtist = {
-      id: uuid(),
-      name: createArtistDto.name,
-      grammy: createArtistDto.grammy,
-    };
-    MemoryDatabase.artists.push(newArtist);
-    return newArtist;
+  constructor(private dbService: DBService) {}
+
+  async create(createArtistDto: CreateArtistDto) {
+    return await this.dbService.createArtist(createArtistDto);
   }
 
-  findAll() {
-    return MemoryDatabase.artists;
+  async findAll() {
+    return await this.dbService.getAllArtists();
   }
 
-  findOne(id: string) {
-    const currArtist = MemoryDatabase.artists.find(
-      (artist) => artist.id === id,
-    );
-    if (!currArtist) {
-      throw new NotFoundException('Artist not found');
-    }
-    return currArtist;
+  async findOne(id: string) {
+    return await this.dbService.getArtist(id);
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto) {
-    const currArtist = this.findOne(id);
-    if (!currArtist) return;
-    const elemIndex = MemoryDatabase.artists.findIndex(
-      (artist) => artist.id === id,
-    );
-
-    MemoryDatabase.artists[elemIndex] = {
-      ...MemoryDatabase.artists[elemIndex],
-      ...updateArtistDto,
-    };
-
-    return MemoryDatabase.artists[elemIndex];
+  async update(id: string, updateArtistDto: UpdateArtistDto) {
+    return await this.dbService.updateArtist(id, updateArtistDto);
   }
 
-  remove(id: string) {
-    const currArtist = this.findOne(id);
-    if (!currArtist) return;
-    MemoryDatabase.artists = MemoryDatabase.artists.filter(
-      (artist) => artist.id !== id,
-    );
-    MemoryDatabase.favorites.artists.forEach((artist) => {
-      if (artist.id === id) {
-        artist.id = null;
-      }
-    });
-
-    MemoryDatabase.tracks.forEach((track) => {
-      if (track.artistId === id) {
-        track.artistId = null;
-      }
-    });
-    MemoryDatabase.favorites.tracks.forEach((track) => {
-      if (track.artistId === id) {
-        track.artistId = null;
-      }
-    });
-    MemoryDatabase.albums.forEach((album) => {
-      if (album.artistId === id) {
-        album.artistId = null;
-      }
-    });
-    MemoryDatabase.favorites.albums.forEach((album) => {
-      if (album.artistId === id) {
-        album.artistId = null;
-      }
-    });
+  async remove(id: string) {
+    return await this.dbService.removeArtist(id);
   }
 }

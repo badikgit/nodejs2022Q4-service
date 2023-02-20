@@ -20,39 +20,40 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  getAll() {
-    return this.usersService.getAll();
+  async getAll() {
+    return await this.usersService.getAll();
   }
 
   @Get(':id')
-  getOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.usersService.getById(id, false);
+  async getOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return await this.usersService.getById(id, false);
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.usersService.create(createUserDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.usersService.remove(id);
+  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+    return await this.usersService.remove(id);
   }
 
   @Put(':id')
-  update(
+  async update(
     @Body() updateUserDto: UpdateUserDto,
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
     if (updateUserDto.oldPassword === updateUserDto.newPassword) {
       throw new ForbiddenException('Password matches the old one');
     } else if (
-      this.usersService.getPass(id).password !== updateUserDto.oldPassword
+      (await this.usersService.getPass(id)).password !==
+      updateUserDto.oldPassword
     ) {
       throw new ForbiddenException('Old password do not match');
     }
-    return this.usersService.update(updateUserDto, id);
+    return await this.usersService.update(updateUserDto, id);
   }
 }
