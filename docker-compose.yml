@@ -17,6 +17,8 @@ services:
       - ./src:/app/src
     depends_on:
       - postgres
+    networks:
+      - postgres
     env_file:
       - docker.env
 
