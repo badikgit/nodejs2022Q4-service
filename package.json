@@ -20,7 +20,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "docker:up": "docker compose up -d --build",
-    "docker:rebuild": "docker compose up --build"
+    "docker:rebuild": "docker compose up --build",
+    "docker:scan:app": "docker scan nodejs2022q4-service-home-library",
+    "docker:scan:db": "docker scan postgres"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
