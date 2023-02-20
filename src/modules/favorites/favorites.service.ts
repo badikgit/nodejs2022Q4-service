@@ -1,79 +1,35 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { MemoryDatabase } from 'src/services/db.service';
+import { Injectable } from '@nestjs/common';
+import { DBService } from '../db/db.service';
 
 @Injectable()
 export class FavoritesService {
-  findAll() {
-    return MemoryDatabase.favorites;
+  constructor(private dbService: DBService) {}
+
+  async findAll() {
+    return await this.dbService.getFavorites();
   }
 
-  createTrack(id: string) {
-    const currTrack = MemoryDatabase.tracks.find((i) => i.id === id);
-    const currTrackFavs = MemoryDatabase.favorites.tracks.find(
-      (track) => track.id === id,
-    );
-    if (!currTrack || currTrackFavs) {
-      throw new UnprocessableEntityException();
-    }
-    MemoryDatabase.favorites.tracks.push(currTrack);
+  async createTrack(id: string) {
+    return await this.dbService.createFavoriteTrack(id);
   }
 
-  removeTrack(id: string) {
-    const currTrack = MemoryDatabase.favorites.tracks.find(
-      (track) => track.id === id,
-    );
-    if (!currTrack) {
-      throw new NotFoundException();
-    }
-    const upd = MemoryDatabase.favorites.tracks.filter(
-      (track) => track.id !== id,
-    );
-    MemoryDatabase.favorites.tracks = upd;
+  async removeTrack(id: string) {
+    return await this.dbService.removeFavoriteTrack(id);
   }
 
-  createArtist(id: string) {
-    const currArtist = MemoryDatabase.artists.find(
-      (artist) => artist.id === id,
-    );
-    if (!currArtist) {
-      throw new UnprocessableEntityException();
-    }
-    MemoryDatabase.favorites.artists.push(currArtist);
+  async createArtist(id: string) {
+    return await this.dbService.createFavoriteArtist(id);
   }
 
-  removeArtist(id: string) {
-    const currArtist = MemoryDatabase.favorites.artists.find(
-      (artist) => artist.id === id,
-    );
-    if (!currArtist) {
-      throw new NotFoundException();
-    }
-    MemoryDatabase.favorites.artists = MemoryDatabase.favorites.artists.filter(
-      (artist) => artist.id !== id,
-    );
+  async removeArtist(id: string) {
+    return await this.dbService.removeFavoriteArtist(id);
   }
 
-  createAlbum(id: string) {
-    const currAlbum = MemoryDatabase.albums.find((artist) => artist.id === id);
-    if (!currAlbum) {
-      throw new UnprocessableEntityException();
-    }
-    MemoryDatabase.favorites.albums.push(currAlbum);
+  async createAlbum(id: string) {
+    return await this.dbService.createFavoriteAlbum(id);
   }
 
-  removeAlbum(id: string) {
-    const currAlbum = MemoryDatabase.favorites.albums.find(
-      (album) => album.id === id,
-    );
-    if (!currAlbum) {
-      throw new NotFoundException();
-    }
-    MemoryDatabase.favorites.albums = MemoryDatabase.favorites.albums.filter(
-      (album) => album.id !== id,
-    );
+  async removeAlbum(id: string) {
+    return await this.dbService.removeFavoriteAlbum(id);
   }
 }

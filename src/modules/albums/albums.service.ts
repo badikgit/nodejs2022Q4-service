@@ -1,67 +1,29 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { MemoryDatabase } from 'src/services/db.service';
-import { v4 as uuid } from 'uuid';
+import { DBService } from '../db/db.service';
 
 @Injectable()
 export class AlbumsService {
-  create(createAlbumDto: CreateAlbumDto) {
-    const newAlbum = {
-      id: uuid(),
-      name: createAlbumDto.name,
-      year: createAlbumDto.year,
-      artistId: createAlbumDto.artistId,
-    };
-    MemoryDatabase.albums.push(newAlbum);
-    return newAlbum;
+  constructor(private dbService: DBService) {}
+
+  async create(createAlbumDto: CreateAlbumDto) {
+    return await this.dbService.createAlbum(createAlbumDto);
   }
 
-  findAll() {
-    return MemoryDatabase.albums;
+  async findAll() {
+    return await this.dbService.getAllAlbums();
   }
 
-  findOne(id: string) {
-    const currAlbum = MemoryDatabase.albums.find((album) => album.id === id);
-    if (!currAlbum) {
-      throw new NotFoundException('Album not found');
-    }
-    return currAlbum;
+  async findOne(id: string) {
+    return await this.dbService.getAlbum(id);
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    const currAlbum = this.findOne(id);
-    if (!currAlbum) return;
-    const elemIndex = MemoryDatabase.albums.findIndex(
-      (album) => album.id === id,
-    );
-
-    MemoryDatabase.albums[elemIndex] = {
-      ...MemoryDatabase.albums[elemIndex],
-      ...updateAlbumDto,
-    };
-
-    return MemoryDatabase.albums[elemIndex];
+  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
+    return await this.dbService.updateAlbum(id, updateAlbumDto);
   }
 
-  remove(id: string) {
-    const currAlbum = this.findOne(id);
-    if (!currAlbum) return;
-    MemoryDatabase.albums = MemoryDatabase.albums.filter(
-      (album) => album.id !== id,
-    );
-    MemoryDatabase.favorites.albums = MemoryDatabase.favorites.albums.filter(
-      (album) => album.id !== id,
-    );
-    MemoryDatabase.tracks.forEach((track) => {
-      if (track.albumId === id) {
-        track.albumId = null;
-      }
-    });
-    MemoryDatabase.favorites.tracks.forEach((track) => {
-      if (track.albumId === id) {
-        track.albumId = null;
-      }
-    });
+  async remove(id: string) {
+    return await this.dbService.removeAlbum(id);
   }
 }
