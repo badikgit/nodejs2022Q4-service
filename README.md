@@ -10,7 +10,7 @@
 ```
 git clone https://github.com/badikgit/nodejs2022Q4-service.git
 cd nodejs2022Q4-service
-git switch dev-part1
+git switch dev-part2
 ```
 
 ## Installing NPM modules
