@@ -54,6 +54,19 @@ export class TracksService {
   }
 
   async remove(id: string): Promise<Track> {
+    const favouriteTracks = await this.prisma.favouriteTrack.findMany();
+
+    const isFavouriteTracks = favouriteTracks.find(
+      (favouriteTrack) => favouriteTrack.trackId === id,
+    );
+    if (isFavouriteTracks) {
+      await this.prisma.favouriteTrack.delete({
+        where: {
+          trackId: id,
+        },
+      });
+    }
+
     return await this.prisma.track.delete({
       where: {
         id,

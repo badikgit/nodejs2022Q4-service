@@ -47,6 +47,34 @@ export class AlbumsService {
   }
 
   async remove(id: string): Promise<Album> {
+    const tracks = await this.prisma.track.findMany();
+    for (const track of tracks) {
+      if (track.albumId === id) {
+        await this.prisma.track.update({
+          where: {
+            id: track.id,
+          },
+          data: {
+            ...track,
+            albumId: null,
+          },
+        });
+      }
+    }
+
+    const favouriteAlbums = await this.prisma.favouriteAlbum.findMany();
+
+    const isFavouriteAlbum = favouriteAlbums.find(
+      (favouriteAlbum) => favouriteAlbum.albumId === id,
+    );
+    if (isFavouriteAlbum) {
+      await this.prisma.favouriteAlbum.delete({
+        where: {
+          albumId: id,
+        },
+      });
+    }
+
     return await this.prisma.album.delete({
       where: {
         id,
