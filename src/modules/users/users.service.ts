@@ -1,33 +1,66 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { DBService } from '../db/db.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateUserDto, UpdateUserDto } from './dto';
+import { User } from 'prisma/prisma-client';
 
 @Injectable()
 export class UsersService {
-  constructor(private dbService: DBService) {}
+  constructor(private prisma: PrismaService) {}
 
-  async getAll() {
-    return await this.dbService.getAllUsers();
+  async getAll(): Promise<User[]> {
+    return await this.prisma.user.findMany();
   }
 
-  async getById(id: string, withPassword?: boolean) {
-    return await this.dbService.getUser(id, withPassword);
+  async getById(id: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    return user;
   }
 
-  async create(userDto: CreateUserDto) {
-    return await this.dbService.createUser(userDto);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    return await this.prisma.user.create({
+      data: {
+        ...createUserDto,
+        version: 1,
+      },
+    });
   }
 
-  async remove(id: string) {
-    return await this.dbService.removeUser(id);
+  async remove(id: string): Promise<User> {
+    return await this.prisma.user.delete({
+      where: {
+        id,
+      },
+    });
   }
 
-  async update(updateUserDto: UpdateUserDto, id: string) {
-    return await this.dbService.updateUser(updateUserDto, id);
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        password: updateUserDto.newPassword,
+        version: user.version + 1,
+      },
+    });
   }
 
-  async getPass(id: string) {
-    return await this.dbService.getUserPass(id);
+  async getPass(id: string): Promise<string> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    return user.password;
   }
 }

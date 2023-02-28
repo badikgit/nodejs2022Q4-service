@@ -1,1 +1,3 @@
-export class CreateFavoriteDto {}
+export class CreateFavoriteDto {
+  message: string;
+}
