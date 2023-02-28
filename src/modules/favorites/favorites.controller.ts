@@ -7,13 +7,14 @@ import {
   Param,
   ParseUUIDPipe,
   UnprocessableEntityException,
+  BadRequestException,
   Post,
 } from '@nestjs/common';
-import { FavoritesService } from './favorites.service';
-import { AlbumsService } from '../albums/albums.service';
 import { ArtistsService } from '../artists/artists.service';
+import { AlbumsService } from '../albums/albums.service';
 import { TracksService } from '../tracks/tracks.service';
-import { FavoriteResponse } from './entities';
+import { FavoritesService } from './favorites.service';
+import { FavoritesResponse } from './entities';
 import { CreateFavoriteDto } from './dto';
 
 @Controller('favs')
@@ -26,7 +27,7 @@ export class FavoritesController {
   ) {}
 
   @Get()
-  async findAll(): Promise<FavoriteResponse> {
+  async findAll(): Promise<FavoritesResponse> {
     return await this.favoritesService.findAll();
   }
 
@@ -53,8 +54,8 @@ export class FavoritesController {
       id,
     );
     if (!isFavoriteTrack) {
-      throw new UnprocessableEntityException(
-        'Track with specified id is not in favourites',
+      throw new BadRequestException(
+        'Track with specified id is not in favorites',
       );
     }
     return await this.favoritesService.removeTrack(id);
@@ -83,8 +84,8 @@ export class FavoritesController {
       await this.favoritesService.findArtists()
     ).includes(id);
     if (!isFavoriteArtist) {
-      throw new UnprocessableEntityException(
-        'Artist with specified id is not in favourites',
+      throw new BadRequestException(
+        'Artist with specified id is not in favorites',
       );
     }
     return await this.favoritesService.removeArtist(id);
@@ -95,13 +96,28 @@ export class FavoritesController {
   async createAlbum(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Promise<CreateFavoriteDto> {
+    const album = await this.albumsService.findOne(id);
+    if (!album) {
+      throw new UnprocessableEntityException(
+        'Album with specified id is not found',
+      );
+    }
     return await this.favoritesService.createAlbum(id);
   }
+
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeAlbum(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Promise<CreateFavoriteDto> {
+    const isFavoriteAlbum = (await this.favoritesService.findAlbums()).includes(
+      id,
+    );
+    if (!isFavoriteAlbum) {
+      throw new BadRequestException(
+        'Album with specified id is not in favorites',
+      );
+    }
     return await this.favoritesService.removeAlbum(id);
   }
 }

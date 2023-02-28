@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateFavoriteDto } from './dto';
-import { FavoriteResponse } from './entities';
+import { FavoritesResponse } from './entities';
 
 @Injectable()
 export class FavoritesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<FavoriteResponse> {
+  async findAll(): Promise<FavoritesResponse> {
     const allArtists = await this.prisma.artist.findMany();
     const favouriteArtist = await this.prisma.favouriteArtist.findMany();
     const artists = favouriteArtist.map((favorites) =>
@@ -16,14 +16,14 @@ export class FavoritesService {
 
     const allAlbums = await this.prisma.album.findMany();
     const favAlbumData = await this.prisma.favouriteAlbum.findMany();
-    const albums = favAlbumData.map((fav) =>
-      allAlbums.find((album) => album.id === fav.albumId),
+    const albums = favAlbumData.map((favorites) =>
+      allAlbums.find((album) => album.id === favorites.albumId),
     );
 
     const allTracks = await this.prisma.track.findMany();
     const favTrackData = await this.prisma.favouriteTrack.findMany();
-    const tracks = favTrackData.map((fav) =>
-      allTracks.find((track) => track.id === fav.trackId),
+    const tracks = favTrackData.map((favorites) =>
+      allTracks.find((track) => track.id === favorites.trackId),
     );
 
     return {
@@ -57,7 +57,7 @@ export class FavoritesService {
 
     if (track) {
       return {
-        message: 'This track has already added to favourites ealier',
+        message: 'This track has been added to favorites earlier',
       };
     }
 
@@ -68,7 +68,7 @@ export class FavoritesService {
     });
 
     return {
-      message: 'Track successfully added to favourites',
+      message: 'Track successfully added to favorites',
     };
   }
 
@@ -80,7 +80,7 @@ export class FavoritesService {
     });
 
     return {
-      message: 'Track successfully removed from favourites',
+      message: 'Track successfully removed from favorites',
     };
   }
 
@@ -93,7 +93,7 @@ export class FavoritesService {
 
     if (artist) {
       return {
-        message: 'This artist has already added to favourites ealier',
+        message: 'This artist has been added to favorites earlier',
       };
     }
 
@@ -104,7 +104,7 @@ export class FavoritesService {
     });
 
     return {
-      message: 'Artist successfully added to favourites',
+      message: 'Artist successfully added to favorites',
     };
   }
 
@@ -116,7 +116,7 @@ export class FavoritesService {
     });
 
     return {
-      message: 'Artist successfully removed from favourites',
+      message: 'Artist successfully removed from favorites',
     };
   }
 
@@ -129,7 +129,7 @@ export class FavoritesService {
 
     if (album) {
       return {
-        message: 'This album has already added to favourites ealier',
+        message: 'This album has been added to favorites earlier',
       };
     }
 
@@ -140,7 +140,7 @@ export class FavoritesService {
     });
 
     return {
-      message: 'Album successfully added to favourites',
+      message: 'Album successfully added to favorites',
     };
   }
 
@@ -152,7 +152,7 @@ export class FavoritesService {
     });
 
     return {
-      message: 'Artist successfully removed from favourites',
+      message: 'Artist successfully removed from favorites',
     };
   }
 }

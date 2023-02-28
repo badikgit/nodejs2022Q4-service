@@ -39,11 +39,9 @@ export class UsersController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Promise<UserResponse> {
     const user = await this.usersService.getById(id);
-
     if (!user) {
       throw new NotFoundException('User with specified id not found');
     }
-
     return {
       id,
       login: user.login,
@@ -71,8 +69,11 @@ export class UsersController {
   async remove(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Promise<UserResponse> {
+    const user = await this.usersService.getById(id);
+    if (!user) {
+      throw new NotFoundException('User with specified id not found');
+    }
     const removedUser = await this.usersService.remove(id);
-
     if (!removedUser) {
       throw new NotFoundException('User with specified id not found');
     }

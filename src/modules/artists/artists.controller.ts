@@ -27,7 +27,7 @@ export class ArtistsController {
 
   @Get()
   async findAll(): Promise<Artist[]> {
-    return this.artistsService.findAll();
+    return await this.artistsService.findAll();
   }
 
   @Get(':id')
