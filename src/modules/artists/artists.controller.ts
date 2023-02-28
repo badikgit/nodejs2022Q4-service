@@ -5,14 +5,15 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
-import { CreateArtistDto } from './dto/create-artist.dto';
-import { UpdateArtistDto } from './dto/update-artist.dto';
+import { CreateArtistDto, UpdateArtistDto } from './dto';
+import { Artist } from 'prisma/prisma-client';
 
 @Controller('artist')
 export class ArtistsController {
@@ -20,31 +21,47 @@ export class ArtistsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createArtistDto: CreateArtistDto) {
+  async create(@Body() createArtistDto: CreateArtistDto): Promise<Artist> {
     return await this.artistsService.create(createArtistDto);
   }
 
   @Get()
-  async findAll() {
-    return this.artistsService.findAll();
+  async findAll(): Promise<Artist[]> {
+    return await this.artistsService.findAll();
   }
 
   @Get(':id')
-  async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return await this.artistsService.findOne(id);
+  async findOne(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): Promise<Artist> {
+    const artist = await this.artistsService.findOne(id);
+    if (!artist) {
+      throw new NotFoundException('Artist with specified id is not found');
+    }
+    return artist;
   }
 
   @Put(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
-  ) {
+  ): Promise<Artist> {
+    const updatedArtist = await this.artistsService.findOne(id);
+    if (!updatedArtist) {
+      throw new NotFoundException('Artist with specified id is not found');
+    }
     return await this.artistsService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
+  async remove(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): Promise<Artist> {
+    const removedArtist = await this.artistsService.findOne(id);
+    if (!removedArtist) {
+      throw new NotFoundException('Artist with specified id is not found');
+    }
     return await this.artistsService.remove(id);
   }
 }

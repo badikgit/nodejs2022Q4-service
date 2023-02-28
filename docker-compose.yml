@@ -1,0 +1,43 @@
+version: '3'
+
+volumes:
+  postgres:
+  home-library:
+
+services:
+  home-library:
+    container_name: home-library
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - postgres
+    networks:
+      - postgres
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    build:
+      dockerfile: ./docker/postgres/Dockerfile
+      context: .
+    restart: always
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - postgres
+    env_file:
+      - .env
+
+networks:
+  postgres:
+    driver: bridge

@@ -1,29 +1,84 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAlbumDto } from './dto/create-album.dto';
-import { UpdateAlbumDto } from './dto/update-album.dto';
-import { DBService } from '../db/db.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreateAlbumDto, UpdateAlbumDto } from './dto';
+import { Album } from 'prisma/prisma-client';
 
 @Injectable()
 export class AlbumsService {
-  constructor(private dbService: DBService) {}
+  constructor(private prisma: PrismaService) {}
 
-  async create(createAlbumDto: CreateAlbumDto) {
-    return await this.dbService.createAlbum(createAlbumDto);
+  async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
+    return await this.prisma.album.create({
+      data: { ...createAlbumDto },
+    });
   }
 
-  async findAll() {
-    return await this.dbService.getAllAlbums();
+  async findAll(): Promise<Album[]> {
+    return await this.prisma.album.findMany();
   }
 
-  async findOne(id: string) {
-    return await this.dbService.getAlbum(id);
+  async findOne(id: string): Promise<Album> {
+    return await this.prisma.album.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 
-  async update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    return await this.dbService.updateAlbum(id, updateAlbumDto);
+  async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
+    const album = await this.prisma.album.findUnique({
+      where: {
+        id,
+      },
+    });
+    return this.prisma.album.update({
+      where: {
+        id,
+      },
+      data: {
+        name: updateAlbumDto.name ? updateAlbumDto.name : album.name,
+        year: updateAlbumDto.year ? updateAlbumDto.year : album.year,
+        artistId:
+          updateAlbumDto.artistId || updateAlbumDto.artistId === null
+            ? updateAlbumDto.artistId
+            : album.artistId,
+      },
+    });
   }
 
-  async remove(id: string) {
-    return await this.dbService.removeAlbum(id);
+  async remove(id: string): Promise<Album> {
+    const tracks = await this.prisma.track.findMany();
+    for (const track of tracks) {
+      if (track.albumId === id) {
+        await this.prisma.track.update({
+          where: {
+            id: track.id,
+          },
+          data: {
+            ...track,
+            albumId: null,
+          },
+        });
+      }
+    }
+
+    const favouriteAlbums = await this.prisma.favouriteAlbum.findMany();
+
+    const isFavouriteAlbum = favouriteAlbums.find(
+      (favouriteAlbum) => favouriteAlbum.albumId === id,
+    );
+    if (isFavouriteAlbum) {
+      await this.prisma.favouriteAlbum.delete({
+        where: {
+          albumId: id,
+        },
+      });
+    }
+
+    return await this.prisma.album.delete({
+      where: {
+        id,
+      },
+    });
   }
 }
