@@ -1,7 +1,7 @@
 import { IsArray } from 'class-validator';
 import { Album, Artist, Track } from '@prisma/client';
 
-export class FavoriteResponse {
+export class FavoritesResponse {
   @IsArray()
   albums: Album[];
 
