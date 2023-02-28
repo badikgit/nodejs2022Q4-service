@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:alpine as build
 
 WORKDIR /app
 
@@ -6,12 +6,15 @@ COPY package*.json .
 
 COPY prisma ./prisma/
 
-RUN npm ci
+RUN npm install
 
 COPY . .
 
-CMD ["npm", "run", "prisma:migrate"]
 
-CMD ["npm", "start"]
+FROM node:alpine as main
+
+COPY --from=build /app ./
+
+CMD ["npm", "run", "prisma:migrate:start"]
 
 EXPOSE ${PORT}

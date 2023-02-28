@@ -23,7 +23,7 @@
     "docker:rebuild": "docker compose up --build",
     "docker:scan:app": "docker scan nodejs2022q4-service-home-library",
     "docker:scan:db": "docker scan postgres",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate:start": "prisma migrate dev && npm start"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
