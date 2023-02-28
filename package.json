@@ -22,10 +22,12 @@
     "docker:up": "docker compose up -d --build",
     "docker:rebuild": "docker compose up --build",
     "docker:scan:app": "docker scan nodejs2022q4-service-home-library",
-    "docker:scan:db": "docker scan postgres"
+    "docker:scan:db": "docker scan postgres",
+    "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",
+    "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^8.0.0",
     "@nestjs/jwt": "^9.0.0",
     "@nestjs/mapped-types": "^1.0.1",

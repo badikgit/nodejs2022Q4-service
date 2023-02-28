@@ -4,10 +4,14 @@ WORKDIR /app
 
 COPY package*.json .
 
-RUN npm install
+COPY prisma ./prisma/
+
+RUN npm ci
 
 COPY . .
 
-EXPOSE ${PORT}
+CMD ["npm", "run", "prisma:migrate"]
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "start"]
+
+EXPOSE ${PORT}
