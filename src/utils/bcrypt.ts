@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 
 export function encodePassword(rawPassword: string) {
-  const SALT = bcrypt.genSaltSync();
+  const SALT = parseInt(process.env.CRYPT_SALT);
   return bcrypt.hashSync(rawPassword, SALT);
 }
 
