@@ -17,7 +17,7 @@ import { ArtistsService } from '../artists/artists.service';
 import { CreateAlbumDto, UpdateAlbumDto } from './dto';
 import { Album } from 'prisma/prisma-client';
 
-@Controller('album')
+@Controller('albums')
 export class AlbumsController {
   constructor(
     private readonly albumsService: AlbumsService,

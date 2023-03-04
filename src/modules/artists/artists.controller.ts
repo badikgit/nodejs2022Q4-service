@@ -16,7 +16,7 @@ import { ArtistsService } from './artists.service';
 import { CreateArtistDto, UpdateArtistDto } from './dto';
 import { Artist } from 'prisma/prisma-client';
 
-@Controller('artist')
+@Controller('artists')
 export class ArtistsController {
   constructor(private readonly artistsService: ArtistsService) {}
 

@@ -1,4 +1,4 @@
-import { IsInt, IsString, IsUUID } from 'class-validator';
+import { IsInt, IsString, IsUUID, IsOptional } from 'class-validator';
 
 export class UserResponse {
   @IsUUID(4)
@@ -6,6 +6,10 @@ export class UserResponse {
 
   @IsString()
   login: string;
+
+  @IsString()
+  @IsOptional()
+  refreshToken: string;
 
   @IsInt()
   version: number;

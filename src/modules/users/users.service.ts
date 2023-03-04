@@ -20,6 +20,15 @@ export class UsersService {
     return user;
   }
 
+  async getByLogin(login: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        login,
+      },
+    });
+    return user;
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     return await this.prisma.user.create({
       data: {
@@ -53,6 +62,28 @@ export class UsersService {
         version: user.version + 1,
       },
     });
+  }
+
+  async updateToken(id: string, refreshToken: string): Promise<User> {
+    const user = {
+      ...(await this.prisma.user.findUnique({
+        where: {
+          id,
+        },
+      })),
+      refreshToken,
+    };
+
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        ...user,
+      },
+    });
+
+    return updatedUser;
   }
 
   async getPass(id: string): Promise<string> {

@@ -18,7 +18,7 @@ import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserResponse } from './entities';
 import { comparePassword, encodePassword } from 'src/utils/bcrypt';
 
-@Controller('user')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -28,6 +28,7 @@ export class UsersController {
       (user) => ({
         id: user.id,
         login: user.login,
+        refreshToken: user.refreshToken,
         version: user.version,
         createdAt: user.createdAt.getTime(),
         updatedAt: user.updatedAt.getTime(),
@@ -48,6 +49,7 @@ export class UsersController {
       id,
       login: user.login,
       version: user.version,
+      refreshToken: user.refreshToken,
       createdAt: user.createdAt.getTime(),
       updatedAt: user.updatedAt.getTime(),
     };
@@ -66,6 +68,7 @@ export class UsersController {
     return {
       id: newUser.id,
       login: newUser.login,
+      refreshToken: newUser.refreshToken,
       version: newUser.version,
       createdAt: newUser.createdAt.getTime(),
       updatedAt: newUser.updatedAt.getTime(),
@@ -89,6 +92,7 @@ export class UsersController {
     return {
       id,
       login: removedUser.login,
+      refreshToken: removedUser.refreshToken,
       version: removedUser.version,
       createdAt: removedUser.createdAt.getTime(),
       updatedAt: removedUser.updatedAt.getTime(),
@@ -124,6 +128,7 @@ export class UsersController {
     return {
       id,
       login: updatedUser.login,
+      refreshToken: updatedUser.refreshToken,
       version: updatedUser.version,
       createdAt: updatedUser.createdAt.getTime(),
       updatedAt: updatedUser.updatedAt.getTime(),
