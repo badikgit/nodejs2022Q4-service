@@ -18,7 +18,7 @@ import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserResponse } from './entities';
 import { comparePassword, encodePassword } from 'src/utils/bcrypt';
 
-@Controller('users')
+@Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -112,7 +112,7 @@ export class UsersController {
     if (updateUserDto.oldPassword === updateUserDto.newPassword) {
       throw new ForbiddenException('Password matches the old one');
     } else if (
-      comparePassword(
+      !comparePassword(
         updateUserDto.oldPassword,
         await this.usersService.getPass(id),
       )

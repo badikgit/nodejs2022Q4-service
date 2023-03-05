@@ -18,7 +18,7 @@ import { TracksService } from './tracks.service';
 import { CreateTrackDto, UpdateTrackDto } from './dto';
 import { Track } from '@prisma/client';
 
-@Controller('tracks')
+@Controller('track')
 export class TracksController {
   constructor(
     private readonly tracksService: TracksService,
