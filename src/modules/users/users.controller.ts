@@ -11,10 +11,12 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import { UserResponse } from './entities';
+import { comparePassword, encodePassword } from 'src/utils/bcrypt';
 
 @Controller('user')
 export class UsersController {
@@ -26,6 +28,7 @@ export class UsersController {
       (user) => ({
         id: user.id,
         login: user.login,
+        refreshToken: user.refreshToken,
         version: user.version,
         createdAt: user.createdAt.getTime(),
         updatedAt: user.updatedAt.getTime(),
@@ -46,6 +49,7 @@ export class UsersController {
       id,
       login: user.login,
       version: user.version,
+      refreshToken: user.refreshToken,
       createdAt: user.createdAt.getTime(),
       updatedAt: user.updatedAt.getTime(),
     };
@@ -53,11 +57,18 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserResponse> {
-    const newUser = await this.usersService.create(createUserDto);
+  async create(
+    @Body(ValidationPipe) createUserDto: CreateUserDto,
+  ): Promise<UserResponse> {
+    const password = encodePassword(createUserDto.password);
+    const newUser = await this.usersService.create({
+      ...createUserDto,
+      password,
+    });
     return {
       id: newUser.id,
       login: newUser.login,
+      refreshToken: newUser.refreshToken,
       version: newUser.version,
       createdAt: newUser.createdAt.getTime(),
       updatedAt: newUser.updatedAt.getTime(),
@@ -81,6 +92,7 @@ export class UsersController {
     return {
       id,
       login: removedUser.login,
+      refreshToken: removedUser.refreshToken,
       version: removedUser.version,
       createdAt: removedUser.createdAt.getTime(),
       updatedAt: removedUser.updatedAt.getTime(),
@@ -89,7 +101,7 @@ export class UsersController {
 
   @Put(':id')
   async update(
-    @Body() updateUserDto: UpdateUserDto,
+    @Body(ValidationPipe) updateUserDto: UpdateUserDto,
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ): Promise<UserResponse> {
     const user = await this.usersService.getById(id);
@@ -100,16 +112,23 @@ export class UsersController {
     if (updateUserDto.oldPassword === updateUserDto.newPassword) {
       throw new ForbiddenException('Password matches the old one');
     } else if (
-      (await this.usersService.getPass(id)) !== updateUserDto.oldPassword
+      !comparePassword(
+        updateUserDto.oldPassword,
+        await this.usersService.getPass(id),
+      )
     ) {
       throw new ForbiddenException('Old password do not match');
     }
-
-    const updatedUser = await this.usersService.update(user.id, updateUserDto);
+    const newPassword = encodePassword(updateUserDto.newPassword);
+    const updatedUser = await this.usersService.update(user.id, {
+      ...updateUserDto,
+      newPassword,
+    });
 
     return {
       id,
       login: updatedUser.login,
+      refreshToken: updatedUser.refreshToken,
       version: updatedUser.version,
       createdAt: updatedUser.createdAt.getTime(),
       updatedAt: updatedUser.updatedAt.getTime(),

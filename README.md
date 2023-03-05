@@ -10,7 +10,7 @@
 ```
 git clone https://github.com/badikgit/nodejs2022Q4-service.git
 cd nodejs2022Q4-service
-git switch dev-part2
+git switch dev-part3
 ```
 
 ## Installing NPM modules
@@ -19,15 +19,6 @@ git switch dev-part2
 npm install
 ```
 
-## Running application
-
-```
-npm run start
-```
-
-After starting the app on port (4000 as default) you can open
-in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
-For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
 ## Running from Docker
 
@@ -40,6 +31,9 @@ npm run docker:up
 npm run docker:rebuild
 ```
 
+After starting the app on port (4000 as default) you can open
+in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
+For more information about OpenAPI/Swagger please visit https://swagger.io/.
 ## Testing
 
 After application running open new terminal and enter:

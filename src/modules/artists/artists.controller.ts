@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ArtistsService } from './artists.service';
 import { CreateArtistDto, UpdateArtistDto } from './dto';
@@ -21,7 +22,10 @@ export class ArtistsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createArtistDto: CreateArtistDto): Promise<Artist> {
+  async create(
+    @Body(new ValidationPipe({ transform: true }))
+    createArtistDto: CreateArtistDto,
+  ): Promise<Artist> {
     return await this.artistsService.create(createArtistDto);
   }
 
@@ -44,7 +48,7 @@ export class ArtistsController {
   @Put(':id')
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Body() updateArtistDto: UpdateArtistDto,
+    @Body(ValidationPipe) updateArtistDto: UpdateArtistDto,
   ): Promise<Artist> {
     const updatedArtist = await this.artistsService.findOne(id);
     if (!updatedArtist) {
